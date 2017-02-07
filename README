@@ -1,0 +1,6 @@
+rover-ground-controll-center (gcc)
+
+*** install ***
+run as root
+
+# make install

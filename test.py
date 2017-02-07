@@ -1,33 +1,86 @@
 import curses
-#start
-stdscr = curses.initscr()
+import time
+import threading
 
-curses.noecho()
-# Kein line-buffer
-curses.cbreak()
-# Escape-Sequenzen aktivieren
-stdscr.keypad(1)
+def get_states(state_win):
+	while 1:
+		state_win.box()
+		state_win.addstr(1,1,"Header",curses.A_BOLD)
+		
+		# mission time
+		zeit = time.strftime("%Y-%m-%d %H:%M:%S")
+		state_win.addstr(2, 1, "Zeit:")
+		state_win.addstr(2, 8, zeit)
+		
+		# 
+		
+		state_win.refresh()
+		time.sleep(1)
 
-# Farben
-curses.start_color()
+def init_curses():
+    stdscr = curses.initscr()
+    curses.noecho()
+    curses.cbreak()
+    stdscr.keypad(1)
+    stdscr.refresh()
+    return stdscr
+    
+def show_menu(win):
+	win.clear()
+	win.addstr(1, 0, "F2:", curses.A_UNDERLINE)
+	win.addstr(1, 4, "messages")
+	win.addstr(1, 13, "x:", curses.A_UNDERLINE)
+	win.addstr(1, 17, "Exit")
+	win.refresh()
 
-curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
-# curses.init_pair(2, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+def makla(menu_win):
+	menu_win.clear()
+	menu_win.addstr(1,2, "x:", curses.A_UNDERLINE)
+	menu_win.addstr(1,5, "Ende ->")
 
-# Fenster und Hintergrundfarben
-stdscr.bkgd(curses.color_pair(1))
-stdscr.refresh()
+	menu_win.refresh()
+	
+	new_win = curses.newwin(22,90,4,0)
+	new_win.box()
+	
+	while True:
+		c = stdscr.getch()
+		if c == ord('x'):
+			break
+		elif c == ord('e'):
+			new_win.addstr(5,2, "bla")
+			new_win.refresh()
+		elif c == ord ('f'):
+			new_win.addstr(5,2, "123")
+			new_win.refresh()
 
-win = curses.newwin(5, 20, 5, 5)
-win.bkgd(curses.color_pair(1))
-win.box()
-win.addstr(2, 2, "Hallo, Welt!")
-win.refresh()
 
-# Warten auf Tastendruck
-c = stdscr.getch()
+# new curses.initscr()
+stdscr = init_curses()
 
-# Ende
+state_win = curses.newwin(5, 40, 0, 0)
+
+# menue window
+menue_win = curses.newwin(0, 40, 5, 0)
+
+# daemon
+clock = threading.Thread(target=get_states, args=(state_win,))
+clock.daemon = True
+clock.start()
+
+while True:
+	#menue_win.clear()
+	#menue_win.refresh()
+	show_menu(menue_win)
+	c = stdscr.getch()
+	if c == ord('x'):
+		break
+	elif c == curses.KEY_F2:
+		makla(menue_win)
+		show_menu(menue_win)
+	elif c == curses.KEY_F3:
+		show_menu(menue_win)
+
 curses.nocbreak()
 stdscr.keypad(0)
 curses.echo()

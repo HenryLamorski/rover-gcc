@@ -1,0 +1,43 @@
+Rover Specs
+
+- 2 Achsen (4 Räder), optional 3 Achsen (6 Räder)
+- leichtbau (Carbon, Glasfaser-Verbundstoffe, Aluminum)
+- 
+
+60fps 360°-3d-cam über VR-Brille, Heat-Imager, Sonar, gps, wlan, gsm, 
+
+
+rover-gcc module:
+
+- Core (als Systemdaemons)
+	- watchdog für Controller
+	- daemon für überwacht Signalstärke und startet undo.revoke()
+	- emergency System über low-level GSM-SMS (undo commands)
+	
+- controller.py (@init iteriert über alle vorhandenen Module): 
+	- startet und beendet module
+	- Stromverbrauch für jedes Modul ala htop
+	- geschätzte Batterielaufzeit bei aktuellem Verbrauch
+	- Übersicht aller Module mit Meta-Daten 
+	-- Meta-Daten: vom Modul spezifizierte "wichtige" Informationen, die im Controller-GUI angezeigt werden.
+	
+- Modul "undo"
+	- @log: speichert alle Steuerkommandos (Rover-movements) inkl. Signalstärke (Link-Quality: iwlist, iwconfig)  (3G/4G/WLAN)
+	- @revoke: sollte keine Datenverbindung mehr zum Client bestehen, soll automatisch zum letzten/nähsten Punkt mit Signalstärke "zurückgefahren" werden
+	(der Rover fährt einfach rückwärts indem er die Kommandos rückwärts erneut ausführt)
+
+
+Server/Client Architektur:
+
+Server (Pi@Rover):
+- pythons lightweight Webserver
+- controller.py liefert json-Daten als Heartbeat alle n-Sekunden zum Client
+
+
+Client (you@laptop/pc):
+
+- bietet Config. für Server-IP, Hearbeat-Interval...
+- 
+
+	
+
